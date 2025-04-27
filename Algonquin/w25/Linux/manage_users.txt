@@ -1,0 +1,132 @@
+#!/bin/sh -u
+# Assignment: lab09
+# Course: CST8102 351
+# Name: Rodrigo 041106665
+# File: manage_users
+# Date submitted: 2025-03-27
+# Description:File to prompt user with various commands, regarding adding/deleting/or modifying a user
+PATH=/bin:/usr/bin ; export PATH
+umask 022
+
+clear
+
+addingUser () {
+        local username; read -p "Enter your username" username
+        if [ -z "$username" ];
+       	then return 1
+       	fi
+	local homedir; read -p "Enter your home directory (absolute path)" homedir
+ 	if [ -z "$homedir" ];
+       	then return 1
+       	fi
+        local loginshell; read -p "Enter your default login shell (absolute path)" loginshell
+	if [ -z "$loginshell" ];
+       	then return 1 
+	fi
+        sudo useradd -m -s "$loginshell" -d "$homedir" "$username" 2>/dev/null
+}
+
+changePGroup () {
+        local username; read -p "Enter your username" username
+	if [ -z "$username" ];
+       	then return 1
+       	fi
+        local groupname; read -p "Enter your groupname" groupname
+	if [ -z "$groupname" ];
+       	then return 1
+       	fi
+        sudo usermod -g "$groupname" "$username" 2>/dev/null
+}
+
+changeOGroup () {
+        local username; read -p "Enter your username" username
+	if [ -z "$username" ];
+       	then return 1
+       	fi
+        local groupname; read -p "Enter your groupname" groupname
+	if [ -z "$groupname" ];
+       	then return 1
+       	fi
+	sudo usermod -aG "$groupname" "$username" 2>/dev/null
+}
+
+changeShell () {
+        local username; read -p "Enter your username" username
+        if [ -z "$username" ];
+       	then return 1
+       	fi
+	local loginshell; read -p "Enter your login shell" loginshell
+        if [ -z "$loginshell" ];
+       	then return 1
+       	fi
+	sudo usermod -s "$loginshell" "$username" 2>/dev/null
+}
+
+changeExpiration () {
+        local username; read -p "Enter your username" username
+	if [ -z "$username" ];
+       	then return 1
+       	fi
+        local expiration; read -p "Enter your expiration date (YYYY-MM-DD)" expiration
+        if [ -z "$expiration" ];
+       	then return 1
+       	fi
+	sudo usermod -e "$expiration" "$username" 2>/dev/null
+}
+
+userDelete () {
+        local username; read -p "Enter your username" username
+	if [ -z "$username" ];
+       	then return 1
+       	fi
+        sudo userdel -r "$username" 2>/dev/null
+}
+
+choice="x"
+
+while [ "$choice" != "Q" ] && [ "$choice" != "q" ]
+do
+	
+	read -p "Enter your choice of command, Press A or a to add a user, Press I or i to change a user's intial/primary group, S or s to change a user's supplementary group, L or l to change a user's login shell, E or e to change the experiation date for a user's account, D or d to delete a user's account, Q or q to quit  " choice
+	case $choice in 
+		A | a)  addingUser; 
+			if [ $? -ne 0 ]; then
+		        	echo "user add failed"; sleep 3; clear;
+		       	else 
+				sleep 3; clear;
+			fi;;
+		I | i) changePGroup;
+		       	if [ $? -ne 0 ]; then 
+                                echo "change primary group failed"; sleep 3; clear;
+			else
+				sleep 3; clear;
+			fi;;
+		S | s) changeOGroup;
+		       if [ $? -ne 0 ]; then
+                                echo "change other group failed"; sleep 3; clear;
+                        else    
+				sleep 3; clear;
+			fi;;
+		L | l) changeShell;
+		       if [ $? -ne 0 ]; then
+                                echo "change shell failed"; sleep 3; clear;
+                        else    
+				sleep 3; clear;
+			fi;;
+		E | e) changeExpiration;
+		       if [ $? -ne 0 ]; then
+                                echo "user expiration failed"; sleep 3; clear;
+                        else    
+				sleep 3; clear;
+			fi;;
+		D | d) userDelete;
+		       if [ $? -ne 0 ]; then
+                                echo "user delete failed"; sleep 3; clear;
+                        else    
+				sleep 3; clear;
+			fi;;
+		Q | q) clear; choice="q";;
+		*) echo "invalid choice selected"; sleep 3; clear;;
+	esac
+done
+

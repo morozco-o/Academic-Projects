@@ -1,0 +1,29 @@
+#!/bin/sh -u
+# Simple program that prompts for a username, and then outputs the current user info
+# based on /etc/passwd file, then outputing current user, home directory using 
+# environment, any error messages are quietly dealth with, (no ifs)
+PATH=/bin:/usr/bin ; export PATH
+umask 022
+read -p "Enter a Username " uname
+uinfo=$(awk -F: -v uname="$uname" '$1 == uname {print $0}' /etc/passwd 2>/dev/null)
+echo "Your Username is"
+echo $uinfo | cut -d: -f1
+echo "Your UID is"
+echo $uinfo | cut -d: -f3
+echo "Your GID"
+echo $uinfo | cut -d: -f4
+echo "Your Comment field is"
+echo $uinfo | cut -d: -f5
+echo "Your Home directory is"
+homeDir=$(echo $uinfo | cut -d: -f6)
+echo $homeDir
+echo "Your Path to shell is"
+echo $uinfo | cut -d: -f7
+echo "Your Home directory size in KB is  "
+sinByte=$( stat --format="%s" $homeDir 2>/dev/null)
+sinKB=$((sinByte/1024))
+echo $sinKB
+echo "Your current user is"
+env | grep LOGNAME | cut -d"=" -f2
+echo "Your current home directory is"
+env | grep HOME | cut -d"=" -f2
