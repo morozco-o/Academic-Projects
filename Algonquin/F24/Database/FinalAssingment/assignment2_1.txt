@@ -1,0 +1,159 @@
+/*
+24F CST8215 Assignment2
+Contributors : Rodrigo Orozco, Ziming Zhao, Mahdi Khaksar, Tidjani Djalal
+Description:
+**Dead Prime Minister High School**
+The SQL written is meant to symbolize a database useful for organizing 
+the many facets of schoollife for a highschool, 
+namely Students, Courses, extracurricular, etc.
+*/
+
+--Creation of the 8 main tables
+CREATE TABLE Post_High_School_Plans (
+	PlanID Int Primary key,
+	Result_of_Applications Varchar(50),
+	College_or_PostsecondaryEducation_Applied_to Varchar(50) not null,
+	Date_of_Applications timestamp not null,
+	College_or_PostsecondaryEducation_Chosen Varchar(50)
+);
+
+CREATE TABLE Standardized_Testing_Results (
+	TestResultID Int Primary key,
+	Result_of_Test int,
+	Name_of_Test varchar(50) not null,
+	Date_of_Test timestamp not null
+);
+
+CREATE TABLE Disciplinary_Action (
+	ActionID Int Primary key,
+	Disciplinary_Action_Taken Varchar(50) not null,
+	Date_of_Incident timestamp not null,
+	Type_of_Incident Varchar(50) not null
+);
+
+CREATE TABLE Legal_Guardians (
+	GuardianID Int Primary key,
+	Name Varchar(50) not null,
+	Address Varchar(50) not null,
+	Gender Varchar(50) not null,
+	Home_Phone Varchar(20) not null
+);
+
+CREATE TABLE Extracurricular_Activities (
+	ActivityID Int Primary key,
+	Academic_Year int not null,
+	Office_or_Position_Held Varchar(50) not null,
+	Name_of_Activity Varchar(50) not null
+);
+
+CREATE TABLE Enrollments (
+	EnrollmentID Int Primary key,
+	Homeroom_Teacher varchar(50) not null,
+	Academic_Year int not null,
+	Homeroom_Location Varchar(50) not null,
+	Grade Varchar(50),
+	Date_Enrolled timestamp not null,
+	Date_Unenrolled timestamp
+);
+
+CREATE TABLE Courses (
+	CourseID Int Primary key,
+	Course_Location Varchar(50) not null,
+	Course_Name varchar(50) not null
+);
+
+CREATE TABLE Students (
+	StudentID Int Primary key,
+	Birthdate date not null,
+	Name varchar(50) not null,
+	Gender varchar(50) not null,
+	Address varchar(50) not null
+);
+
+--creation of the 7 associative lookup tables
+CREATE TABLE PostGrad_Planning (
+	PlanID int,
+	StudentID int
+	);
+
+ALTER TABLE PostGrad_Planning
+	ADD CONSTRAINT FK_PlanStudent
+	FOREIGN KEY (PlanID) REFERENCES Post_High_School_Plans(PlanID);
+ALTER TABLE PostGrad_Planning
+	ADD CONSTRAINT FK_StudentPlan
+	FOREIGN KEY (StudentID) REFERENCES Students(StudentID);
+
+
+CREATE TABLE Grades (
+	TestResultID int,
+	StudentID int
+	);
+
+ALTER TABLE Grades
+	ADD CONSTRAINT FK_TestResultStudent
+	FOREIGN KEY (TestResultID) REFERENCES Standardized_Testing_Results(TestResultID);
+ALTER TABLE Grades
+	ADD CONSTRAINT FK_StudentTestResult
+	FOREIGN KEY (StudentID) REFERENCES Students(StudentID);
+
+
+CREATE TABLE Infractions (
+	ActionID int,
+	StudentID int
+	);
+
+ALTER TABLE Infractions
+	ADD CONSTRAINT FK_ActionStudent
+	FOREIGN KEY (ActionID) REFERENCES Disciplinary_Action(ActionID);
+ALTER TABLE Infractions
+	ADD CONSTRAINT FK_StudentAction
+	FOREIGN KEY (StudentID) REFERENCES Students(StudentID);
+
+
+CREATE TABLE Guardianship (
+	GuardianID int,
+	StudentID int
+	);
+
+ALTER TABLE Guardianship
+	ADD CONSTRAINT FK_GuardianStudent
+	FOREIGN KEY (GuardianID) REFERENCES Legal_Guardians(GuardianID);
+ALTER TABLE Guardianship
+	ADD CONSTRAINT FK_StudentGuardian
+	FOREIGN KEY (StudentID) REFERENCES Students(StudentID);
+
+
+CREATE TABLE Clubs (
+	ActivityID int,
+	StudentID int
+	);
+ALTER TABLE Clubs
+	ADD CONSTRAINT FK_ActivityStudent
+	FOREIGN KEY (ActivityID) REFERENCES Extracurricular_Activities(ActivityID);
+ALTER TABLE Clubs
+	ADD CONSTRAINT FK_StudentActivity
+	FOREIGN KEY (StudentID) REFERENCES Students(StudentID);
+
+
+CREATE TABLE Enrolled_In (
+	EnrollmentID int,
+	StudentID int
+	);
+ALTER TABLE Enrolled_In
+	ADD CONSTRAINT FK_EnrollmentStudent
+	FOREIGN KEY (EnrollmentID) REFERENCES Enrollments(EnrollmentID);
+ALTER TABLE Enrolled_In
+	ADD CONSTRAINT FK_StudentEnrollment
+	FOREIGN KEY (StudentID) REFERENCES Students(StudentID);
+
+
+CREATE TABLE Subjects (
+	EnrollmentID int,
+	CourseID int
+	);
+ALTER TABLE Subjects
+	ADD CONSTRAINT FK_EnrollmentCourse
+	FOREIGN KEY (EnrollmentID) REFERENCES Enrollments(EnrollmentID);
+ALTER TABLE Subjects
+	ADD CONSTRAINT FK_CourseEnrollment
+	FOREIGN KEY (CourseID) REFERENCES Courses(CourseID);

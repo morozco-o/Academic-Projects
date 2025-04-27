@@ -1,0 +1,81 @@
+/*
+24F CST8215 Assignment2
+Contributors : Rodrigo Orozco, Ziming Zhao, Mahdi Khaksar, Tidjani Djalal
+Description:
+**Dead Prime Minister High School**
+The Queries is written to test how the database works with various queries in different designs.
+*/
+
+-- Query 1: A simple query that pulls all columns and rows from a table
+SELECT * FROM Students;
+
+-- Query 2: A query that displays a subset of columns
+SELECT CourseID, Course_Name
+FROM Courses;
+
+-- Query 3: A query that displays a subset of columns with a single clause (predicate)
+-- WHERE statement
+SELECT StudentID, Name
+FROM Students
+WHERE Gender = 'Male';
+
+-- Query 4: A query that displays a subset of columns with a multi-clause (predicate) WHERE
+-- statement using AND/OR
+SELECT ActionID,
+Type_Of_Incident, disciplinary_Action_Taken
+FROM disciplinary_action
+WHERE Type_Of_Incident = 'Fighting' AND (disciplinary_Action_Taken = 'Suspension for 3 days' OR
+disciplinary_Action_Taken = 'Counseling session');
+
+-- Query 5: Perform a single table join between Students and LegalGuardians tables
+-- students and guardianship
+SELECT Students.StudentID, Students.Name AS StudentName, guardianship.guardianid as legal_Guardians
+from students
+JOIN guardianship ON Students.studentid = guardianship.studentID;
+
+
+-- Query 6: Perform a multi-table join between Students, Enrolled_in, and Enrollments
+SELECT Students.StudentID, Students.Name, enrolled_in.enrollmentid, enrollments.homeroom_teacher
+FROM Students
+JOIN Enrolled_in on students.studentid = enrolled_in.enrollmentid
+join enrollments on enrollments.enrollmentid = enrolled_in.enrollmentid;
+
+
+-- Query 7: Perform an aggregate (count) on the number of students
+SELECT COUNT(studentid)
+FROM students;
+
+-- Query 8: Perform an aggregate count of teacher with a GROUP BY of academic year
+SELECT academic_year,count(homeroom_teacher) as number_of_teachers from enrollments
+group by academic_year;
+
+
+-- Query 9: A query that performs an aggregate (count, min, max, sum, avg, etc.). with a
+-- GROUP BY and a HAVING clause
+SELECT
+AVG(standardized_testing_results.result_of_test) AS AverageGrade, standardized_testing_results.name_of_test
+FROM
+standardized_testing_results
+join
+grades on standardized_testing_results.testResultid = grades.testResultid
+JOIN
+students ON students.studentid = grades.studentid
+GROUP BY
+standardized_testing_results.name_of_test
+HAVING
+AVG(standardized_testing_results.result_of_test) > 50;
+
+-- Query 10: A query that performs a subquery either as part of the WHERE clause or as a
+-- derived/virtual table
+SELECT * from disciplinary_action da
+join infractions i
+on da.actionid = i.actionid
+where i.studentid = (select studentid from students where name = 'Kirby Woodward');
+
+-- Query 11: A query that performs an aggregate with a join and a group by.
+select count(s.studentID), e.homeroom_teacher from students s 
+join enrolled_in ei on 
+s.studentid = ei.studentid
+join enrollments e on
+e.enrollmentid = ei.enrollmentid
+group by homeroom_teacher;

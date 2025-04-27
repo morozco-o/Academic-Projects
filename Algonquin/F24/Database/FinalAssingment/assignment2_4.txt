@@ -1,0 +1,28 @@
+/*
+24F CST8215 Assignment2
+Contributors : Rodrigo Orozco, Ziming Zhao, Mahdi Khaksar, Tidjani Djalal
+Description:
+**Dead Prime Minister High School**
+Views created of previous queries (4,9)
+*/
+
+
+CREATE view fighting as SELECT ActionID, 
+Type_Of_Incident, disciplinary_Action_Taken
+FROM disciplinary_action
+WHERE Type_Of_Incident = 'Fighting' AND (disciplinary_Action_Taken = 'Suspension for 3 days' OR
+disciplinary_Action_Taken = 'Counseling session');
+
+
+CREATE view average_testing_g50 as SELECT
+AVG(standardized_testing_results.result_of_test) AS AverageGrade, standardized_testing_results.name_of_test
+FROM
+standardized_testing_results
+join
+grades on standardized_testing_results.testResultid = grades.testResultid
+JOIN
+students ON students.studentid = grades.studentid
+GROUP BY
+standardized_testing_results.name_of_test
+HAVING
+AVG(standardized_testing_results.result_of_test) > 50;
